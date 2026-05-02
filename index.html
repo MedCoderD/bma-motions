@@ -3,97 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello Sidebar</title>
+    <title>BMA Policy Portal</title>
     <style>
         :root {
-            --sidebar-width: 260px;
+            --sidebar-width: 280px;
             --sidebar-bg: #f7f6f3;
             --hover-color: #efefed;
-            --text-color: #37352f;
+            --selection-blue: #0060A6;
+            --bma-blue: #004d95;
+            --success-green: #76d053;
+            --warning-orange: #f5a623;
+            --apple-bezier: cubic-bezier(0.2, 0, 0, 1);
+            --item-height: 40px;
+            --border-radius: 8px;
         }
 
         body {
             margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             display: flex;
-            color: var(--text-color);
+            color: #37352f;
+            background-color: white;
+            overflow: hidden;
         }
 
-        /* Sidebar Styles */
+        /* --- Badge Hover Animation --- */
+        @keyframes glow-pulse {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* --- Left Sidebar --- */
         #sidebar {
             width: var(--sidebar-width);
             height: 100vh;
             background-color: var(--sidebar-bg);
-            transition: transform 0.3s ease;
+            transition: transform 0.4s var(--apple-bezier);
             border-right: 1px solid #e8e8e7;
-            position: fixed;
-            left: 0;
-            top: 0;
-            overflow-y: auto;
-        }
-
-        #sidebar.collapsed {
-            transform: translateX(-100%);
-        }
-
-        /* Main Content Styles */
-        #main-content {
-            margin-left: var(--sidebar-width);
-            flex-grow: 1;
-            padding: 40px;
-            transition: margin-left 0.3s ease;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            position: fixed; left: 0; top: 0;
+            padding: 60px 10px 0 10px;
             box-sizing: border-box;
+            z-index: 10;
+        }
+        #sidebar.collapsed { transform: translateX(-100%); }
+
+        #nav-indicator {
+            position: absolute; left: 0; width: 100%; height: var(--item-height); 
+            background-color: var(--selection-blue);
+            transition: transform 0.2s var(--apple-bezier);
+            z-index: 1; border-radius: var(--border-radius);
         }
 
-        #main-content.expanded {
-            margin-left: 0;
-        }
-
-        /* Taskbar Items */
-        .sidebar-header {
-            padding: 20px;
-            font-weight: 600;
-            font-size: 14px;
-            color: #91918e;
-            text-transform: uppercase;
-        }
-
+        .nav-items-container { position: relative; }
         .nav-item {
-            padding: 8px 20px;
-            cursor: pointer;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            transition: background 0.2s;
+            height: var(--item-height); padding: 0 15px; margin-bottom: 4px;
+            cursor: pointer; font-size: 14px; display: flex; align-items: center;
+            transition: color 0.15s ease; position: relative; z-index: 2;
+            border-radius: var(--border-radius);
         }
+        .nav-item.selected { color: white; }
 
-        .nav-item:hover {
-            background-color: var(--hover-color);
+        /* --- Main Content --- */
+        #main-content {
+            margin-left: var(--sidebar-width); flex-grow: 1; padding: 60px 80px;
+            transition: all 0.4s var(--apple-bezier);
+            height: 100vh; overflow-y: auto; box-sizing: border-box;
         }
+        #main-content.sidebar-collapsed { margin-left: 0; }
 
-        /* Toggle Button */
-        #toggle-btn {
-            position: fixed;
-            left: 10px;
-            top: 10px;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 5px 10px;
-            cursor: pointer;
-            z-index: 100;
+        /* --- Right Panel (Resizable) --- */
+        #right-panel {
+            width: 450px; min-width: 350px; max-width: 90vw;
+            height: 100vh; background-color: white; border-left: 1px solid #e8e8e7;
+            position: fixed; right: 0; top: 0;
+            transform: translateX(100%);
+            transition: transform 0.4s var(--apple-bezier), width 0.4s var(--apple-bezier);
+            z-index: 15; padding: 30px 25px; box-sizing: border-box; overflow-y: auto;
+        }
+        #right-panel.open { transform: translateX(0); }
+        #resizer { width: 6px; height: 100%; position: absolute; left: 0; top: 0; cursor: col-resize; z-index: 20; }
+
+        .close-right-container { display: flex; justify-content: flex-start; margin-bottom: 30px; }
+        .close-right { 
+            width: 44px; height: 44px; background-color: #f1f1f1; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 22px; color: #333;
+            transition: all 0.2s ease; user-select: none; border: none;
+        }
+        .close-right:hover { background-color: #e5e5e5; transform: scale(1.05); }
+
+        /* --- RHS Taskbar Typography --- */
+        .timeline-item, .date-box, .content-box, .profile-stack span {
             font-size: 12px;
         }
-
-        #toggle-btn:hover {
-            background: var(--hover-color);
+        .profile-stack b { 
+            font-size: 14px; 
+            display: block; 
+            line-height: 1.4;
+            white-space: nowrap;
         }
 
-        h1 { font-size: 3rem; margin: 0; }
+        /* Document Formatting */
+        .policy-header { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; }
+        .badge-blue { background-color: var(--bma-blue); color: white; padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; }
+        
+        .badge-outline { 
+            border: 1px solid #333; padding: 6px 16px; border-radius: 20px; 
+            font-size: 13px; display: flex; align-items: center; gap: 8px;
+            cursor: help; transition: all 0.4s ease;
+            background: transparent; background-size: 200% 200%;
+        }
+        .badge-outline:hover {
+            border-color: var(--success-green);
+            background-image: linear-gradient(-45deg, #ffffff, #f0fff0, #dcfce7, #f0fff0);
+            animation: glow-pulse 3s ease infinite;
+            box-shadow: 0 4px 15px rgba(118, 208, 83, 0.1);
+        }
+
+        .dot-green { width: 12px; height: 12px; background: var(--success-green); border-radius: 50%; }
+        .policy-meta { color: #37352f; line-height: 1.4; margin-bottom: 25px; font-size: 15px; }
+        .policy-body { line-height: 1.6; font-size: 15px; max-width: 850px; color: #000; }
+        .result-title { font-weight: bold; font-size: 16px; margin-top: 30px; margin-bottom: 10px; }
+        .warning-label { color: var(--warning-orange); font-weight: bold; }
+        .pass-label { color: var(--success-green); font-weight: bold; }
+        .result-sub-item { margin-left: 20px; margin-top: 5px; font-size: 15px; }
+        .view-more { color: #0060A6; text-decoration: underline; font-size: 15px; margin-top: 25px; display: block; cursor: pointer; font-weight: bold;}
+        .keyword-tag { display: inline-block; background: #b0b0b0; color: white; padding: 4px 12px; border-radius: 4px; margin-left: 5px; }
+
+        /* --- Timeline Structure --- */
+        .timeline-container { position: relative; padding-left: 10px; }
+        #calculated-line { position: absolute; left: 135px; top: 22px; width: 2px; background-color: black; z-index: 1; }
+        .timeline-item { display: flex; gap: 15px; margin-bottom: 60px; align-items: flex-start; position: relative; z-index: 2; }
+        .profile-stack { text-align: center; width: 100px; flex-shrink: 0; }
+        .timeline-photo { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; background: #eee; border: 1px solid #eee; }
+        .timeline-marker { width: 24px; flex-shrink: 0; display: flex; justify-content: center; padding-top: 10px; }
+        .dot { width: 24px; height: 24px; border: 2px solid #000; border-radius: 50%; background: white; box-sizing: border-box; }
+        .date-box { font-weight: bold; font-style: italic; width: 85px; padding-top: 14px; flex-shrink: 0; }
+        .content-box { border: 1px solid #333; border-radius: 12px; padding: 18px; line-height: 1.5; flex-grow: 1; background: white; }
+
+        #toggle-btn { position: fixed; left: 20px; top: 15px; background: white; border: 1px solid #ddd; border-radius: 6px; padding: 6px 12px; cursor: pointer; z-index: 100; font-size: 12px; }
     </style>
 </head>
 <body>
@@ -101,31 +150,165 @@
     <button id="toggle-btn">☰ Menu</button>
 
     <div id="sidebar">
-        <div class="sidebar-header">About BMA Policy</div>
-        <div class="nav-item">Annual Representative Meeting</div>
-        <div class="nav-item">Special Representative Meeting</div>
-        <div class="nav-item">Consultants</div>
-        <div class="nav-item">Divisional honorary secretaries</div>
-        <div class="nav-item">General practitioners</div>
-        <div class="nav-item">Medical students</div>
-        <div class="nav-item">Resident doctors</div>
-        <div class="nav-item">Retired Members</div>
+        <div class="nav-items-container">
+            <div id="nav-indicator"></div>
+            <div class="nav-item" data-page="welcome">Welcome</div>
+            <div class="nav-item" data-page="medical">Medical students</div>
+            <div class="nav-item" data-page="default">Resident doctors</div>
+            <div class="nav-item" data-page="default">Consultants</div>
+            <div class="nav-item" data-page="default">General practitioners</div>
+            <div class="nav-item" data-page="default">Annual Representative Meeting</div>
+        </div>
+    </div>
+
+    <div id="right-panel">
+        <div id="resizer"></div>
+        <div class="close-right-container">
+            <button class="close-right" onclick="closeRightPanel()">«</button>
+        </div>
+        
+        <div class="timeline-container">
+            <div id="calculated-line"></div>
+            
+            <!-- Noor Al-Saffar -->
+            <div class="timeline-item" id="item-top">
+                <div class="profile-stack">
+                    <img src="https://via.placeholder.com/70" class="timeline-photo">
+                    <b>Noor Al-Saffar</b><br>
+                    <span>Chair of agenda committee 2024-25</span>
+                </div>
+                <div class="timeline-marker"><div class="dot"></div></div>
+                <div class="date-box">7th April 2025</div>
+                <div class="content-box">
+                    Policy <span style="text-decoration: underline;">#13243546</span> by UK-MSC EDUCATION SUBCOMMITTEE <b style="color:var(--warning-orange)">CARRIED IN PARTS</b> at the BMA Medical Students Conference held on Friday 4th and Saturday 5th April 2025.
+                    <br><br>
+                    Last updated: 10th April 2026
+                </div>
+            </div>
+
+            <!-- Callum Williams -->
+            <div class="timeline-item" id="item-bottom">
+                <div class="profile-stack">
+                    <img src="https://via.placeholder.com/70" class="timeline-photo">
+                    <b>Callum Williams</b><br>
+                    <span>UKMSC Deputy Chair (Education) 2024-26</span>
+                </div>
+                <div class="timeline-marker"><div class="dot"></div></div>
+                <div class="date-box">23rd March 2026</div>
+                <div class="content-box">
+                    MSC has commissioned a medical student survey in 2025 to gather views related to professionalism and fitness to practice experienced by medical students across the UK. Over 2,500 med students have responded and a report is currently being finalised and will be launched in spring 2025. The insights from this work will underpin BMA MSC's lobbying for clearer, fairer and more supportive professionalism policies.<br><br>
+                    Furthermore, MSC officers have presented the preliminary results of their survey and report to the Medical Schools Council.
+                    <br><br>
+                    Last updated: 23rd March 2026
+                </div>
+            </div>
+        </div>
     </div>
 
     <div id="main-content">
-        <h1>Hello</h1>
+        <div id="dynamic-area"></div>
     </div>
 
     <script>
         const sidebar = document.getElementById('sidebar');
+        const rightPanel = document.getElementById('right-panel');
+        const resizer = document.getElementById('resizer');
         const content = document.getElementById('main-content');
-        const btn = document.getElementById('toggle-btn');
+        const dynamicArea = document.getElementById('dynamic-area');
+        const navItems = document.querySelectorAll('.nav-item');
+        const indicator = document.getElementById('nav-indicator');
+        const calcLine = document.getElementById('calculated-line');
 
-        btn.addEventListener('click', () => {
+        function updateTimelineLine() {
+            const topDot = document.querySelector('#item-top .dot');
+            const bottomDot = document.querySelector('#item-bottom .dot');
+            if (topDot && bottomDot) {
+                const topPos = topDot.getBoundingClientRect().top + (topDot.offsetHeight / 2);
+                const bottomPos = bottomDot.getBoundingClientRect().top + (bottomDot.offsetHeight / 2);
+                calcLine.style.height = `${bottomPos - topPos}px`;
+            }
+        }
+
+        function openMoreInfo() {
+            sidebar.classList.add('collapsed');
+            content.classList.add('sidebar-collapsed');
+            rightPanel.style.width = "50vw";
+            rightPanel.classList.add('open');
+            updateLayoutPadding();
+            setTimeout(updateTimelineLine, 450);
+        }
+
+        function closeRightPanel() {
+            rightPanel.classList.remove('open');
+            sidebar.classList.remove('collapsed');
+            content.classList.remove('sidebar-collapsed');
+            updateLayoutPadding();
+        }
+
+        document.getElementById('toggle-btn').addEventListener('click', () => {
             sidebar.classList.toggle('collapsed');
-            content.classList.toggle('expanded');
+            content.classList.toggle('sidebar-collapsed');
         });
-    </script>
 
+        let isResizing = false;
+        resizer.addEventListener('mousedown', () => { isResizing = true; document.body.style.cursor = 'col-resize'; });
+        document.addEventListener('mousemove', (e) => {
+            if (!isResizing) return;
+            let newWidth = window.innerWidth - e.clientX;
+            if (newWidth > 350 && newWidth < (window.innerWidth * 0.9)) {
+                rightPanel.style.width = `${newWidth}px`;
+                updateLayoutPadding();
+                updateTimelineLine();
+            }
+        });
+        document.addEventListener('mouseup', () => { isResizing = false; document.body.style.cursor = 'default'; });
+
+        function updateLayoutPadding() {
+            content.style.marginRight = rightPanel.classList.contains('open') ? rightPanel.style.width : "0";
+        }
+
+        function updateContent(element) {
+            indicator.style.transform = `translateY(${element.offsetTop}px)`;
+            dynamicArea.style.opacity = '0';
+            setTimeout(() => {
+                const pageType = element.getAttribute('data-page');
+                navItems.forEach(i => i.classList.remove('selected'));
+                element.classList.add('selected');
+
+                if (pageType === 'medical') {
+                    dynamicArea.innerHTML = `
+                        <div class="policy-header">
+                            <div class="badge-blue">Policy ID: #13243546</div>
+                            <div class="badge-outline">
+                                <span class="dot-green"></span> 
+                                Actions recorded in the past year
+                            </div>
+                        </div>
+                        <div class="policy-meta">Policy group: Medical students, 2025<br>(Source: Conference)</div>
+                        <div class="policy-body">
+                            <p>This conference recognises that medical students are vulnerable to inappropriate and distressing fitness to practice and professionalism investigations by medical schools. Given students have no right to union representation and that there is minimal accountability for medical schools weaponising investigations or threats of investigation, this meeting calls upon the BMA to:</p>
+                            <p>i) work to gather robust national data on medical student experiences of fitness to practice and professionalism investigations by medical schools;<br>
+                            ii) lobby the General Medical Council and UK medical schools, including via the Medical Schools Council, to work to gather robust national data on medical student experiences of fitness to practice and professionalism investigations by medical schools;<br>
+                            iii) lobby the General Medical Council and UK medical schools, including via the Medical Schools Council, to introduce national guidance on avoiding unnecessary threats of fitness to practice and professionalism investigation against students.</p>
+                        </div>
+                        <div class="result-title">Result:</div>
+                        <div>⚠️ <span class="warning-label">CARRIED IN PARTS</span></div>
+                        <div class="result-sub-item">(i) <span class="pass-label">PASSED</span></div>
+                        <div class="result-sub-item">(ii) <span class="pass-label">PASSED</span></div>
+                        <div class="view-more" onclick="openMoreInfo()">> View more information <</div>
+                        <div style="margin-top:25px;">Keyword(s): <span class="keyword-tag">#medical schools council</span></div>
+                    `;
+                } else {
+                    dynamicArea.innerHTML = `<h1 style="margin-top:100px; text-align:center;">${element.textContent}</h1>`;
+                }
+                dynamicArea.style.opacity = '1';
+                setTimeout(updateTimelineLine, 50);
+            }, 100);
+        }
+
+        navItems.forEach(item => item.addEventListener('click', () => updateContent(item)));
+        window.addEventListener('resize', updateTimelineLine);
+        window.onload = () => updateContent(document.querySelector('[data-page="medical"]'));
+    </script>
 </body>
 </html>
