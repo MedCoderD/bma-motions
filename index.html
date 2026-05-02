@@ -299,7 +299,18 @@
                         <div style="margin-top:25px;">Keyword(s): <span class="keyword-tag">#medical schools council</span></div>
                     `;
                 } else {
-                    dynamicArea.innerHTML = `<h1 style="margin-top:100px; text-align:center;">${element.textContent}</h1>`;
+                    // This checks if the page clicked is "welcome" to show the logo
+                    if (element.getAttribute('data-page') === 'welcome') {
+                        dynamicArea.innerHTML = `
+                            <div style="text-align:center; margin-top:80px;">
+                                <img src="images/bma.jpg" alt="BMA Logo" style="width:180px; margin-bottom:20px; opacity:0.9;">
+                                <h1 style="font-size:28px;">Welcome to the Policy Portal</h1>
+                                <p style="color:#666;">Select a category from the sidebar to begin.</p>
+                            </div>`;
+                    } else {
+                        // This handles all other categories (Consultants, GPs, etc.)
+                        dynamicArea.innerHTML = `<h1 style="margin-top:100px; text-align:center;">${element.textContent}</h1>`;
+                    }
                 }
                 dynamicArea.style.opacity = '1';
                 setTimeout(updateTimelineLine, 50);
