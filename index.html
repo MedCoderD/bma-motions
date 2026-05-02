@@ -304,8 +304,8 @@
                         dynamicArea.innerHTML = `
                             <div style="text-align:center; margin-top:80px;">
                                 <img src="images/bma.jpg" alt="BMA Logo" style="width:180px; margin-bottom:20px; opacity:0.9;">
-                                <h1 style="font-size:28px;">Welcome to the Policy Portal</h1>
-                                <p style="color:#666;">Select a category from the sidebar to begin.</p>
+                                <h1 style="font-size:28px;">Welcome to the BMA Policy Portal</h1>
+                                <p style="color:#666;">Select a category from the sidebar to explore our policies.</p>
                             </div>`;
                     } else {
                         // This handles all other categories (Consultants, GPs, etc.)
@@ -319,7 +319,7 @@
 
         navItems.forEach(item => item.addEventListener('click', () => updateContent(item)));
         window.addEventListener('resize', updateTimelineLine);
-        window.onload = () => updateContent(document.querySelector('[data-page="medical"]'));
+        window.onload = () => updateContent(document.querySelector('[data-page="welcome"]'));
     </script>
 </body>
 </html>
